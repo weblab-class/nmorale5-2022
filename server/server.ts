@@ -8,6 +8,7 @@ import path from "path"; // Allows us to retrieve file paths
 import auth from "./auth"; // weblab authentication helper
 import socketManager from "./server-socket"; // websockets
 import api from "./api";
+import config from "dotenv"
 // Loads environmental variables
 dotenv.config({});
 

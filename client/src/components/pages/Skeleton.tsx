@@ -48,6 +48,9 @@ class Skeleton extends Component<Props & RouteComponentProps, State> {
           <li>Add a favicon to your website at the path client/dist/favicon.ico</li>
           <li>Update website title in client/dist/index.html</li>
         </ul>
+        <h1>im super duper sorry but i couldnt finish the stuff i was working on</h1>
+        <h2>so its just the default page for now but at least its deployed??</h2>
+        <h3>Smile City - Team Yo-Yo</h3>
       </>
     )
   }
