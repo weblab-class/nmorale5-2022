@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
-import Smiles from "../modules/Smiles"
+import { RouteComponentProps } from "@reach/router";
+import Smiles from '../modules/Smiles';
+import SingleRoom from '../modules/SingleRoom';
+import { get, post } from '../../utilities'
 
 interface Props {
-    userId: string;
+    userId: String;
 }
 
 interface State {
     smiles: number;
-    wage: number;
+    rooms: SingleRoom[]
 }
 
 class Game extends Component<Props, State> {
@@ -15,27 +18,28 @@ class Game extends Component<Props, State> {
         super(props);
         this.state = {
             smiles: 0,
-            wage: 1,
+            rooms: new Array<SingleRoom>(),
         };
     }
 
-    collectSmiles = () => {
-        this.setState({
-            smiles: this.state.smiles + this.state.wage,
-        });
-    };
+    getUserData = () => {
+        get(`/api/smiles`, { userId: this.props.userId }).then((smile) => this.setState({smiles: smile}));
+    }
 
-    upgradeWage = () => {
-        this.setState({
-            wage: this.state.wage + 1,
-        });
+    componentDidMount() {
+        this.getUserData();
+    }
+
+    collectIncome = () => {
+        post(`/api/smiles`, { userId: this.props.userId, smiles: this.state.smiles + 100 })
+        this.setState({smiles: this.state.smiles + 100});
     }
 
     render() {
         return (
-            <p>Smiles: <Smiles smiles={this.state.smiles} /></p>
+            <button onClick={this.collectIncome} >My Smiles: {this.state.smiles}</button>
         )
-    };
+    }
 }
 
 export default Game;

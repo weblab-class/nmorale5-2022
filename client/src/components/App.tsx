@@ -6,6 +6,7 @@ import Skeleton from './pages/Skeleton';
 import { GoogleLoginResponse } from 'react-google-login';
 import { socket } from '../client-socket';
 import User from '../../../shared/User';
+import Game from './pages/Game';
 import "../utilities.css";
 
 type State = {
@@ -50,6 +51,7 @@ class App extends Component<{}, State> {
     return (
       <Router>
         <Skeleton path="/" handleLogin={this.handleLogin} handleLogout={this.handleLogout} userId={this.state.userId}/>
+        <Game userId={this.state.userId}/>
         <NotFound default={true}/>
       </Router>
     )

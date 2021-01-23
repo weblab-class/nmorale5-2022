@@ -1,12 +1,10 @@
 import { Schema, model, Document } from "mongoose";
 
 const StatsSchema = new Schema({
-    name: String,
-    xp: Number,
+    userId: String,
     smiles: Number,
-    wage: Number,
 });
 
-const StatsModel = model("stats", StatsSchema);
+const StatsModel = model("Stats", StatsSchema);
 
-export default StatsModel
+export default StatsModel;
