@@ -1,15 +1,17 @@
-import React, { Component } from "react";
+import React, { Component, useEffect } from "react";
 import GoogleLogin, { GoogleLogout } from "react-google-login";
 
 import "../../utilities.css";
 import "./Skeleton.css";
 
 //TODO: REPLACE WITH YOUR OWN CLIENT_ID
-const GOOGLE_CLIENT_ID = "121479668229-t5j82jrbi9oejh7c8avada226s75bopn.apps.googleusercontent.com";
+const GOOGLE_CLIENT_ID = "739546526580-biu102078t6rnjc630m92fg456933d62.apps.googleusercontent.com";
 
 const Skeleton = ({ userId, handleLogin, handleLogout }) => {
+
   return (
     <>
+    <div>test</div>
       {userId ? (
         <GoogleLogout
           clientId={GOOGLE_CLIENT_ID}

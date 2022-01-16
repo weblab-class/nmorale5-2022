@@ -5,7 +5,7 @@ import Skeleton from "./pages/Skeleton.js";
 
 import "../utilities.css";
 
-import { socket } from "../client-socket.js";
+// import { socket } from "../client-socket.js";
 
 import { get, post } from "../utilities";
 
@@ -29,7 +29,7 @@ const App = () => {
     const userToken = res.tokenObj.id_token;
     post("/api/login", { token: userToken }).then((user) => {
       setUserId(user._id);
-      post("/api/initsocket", { socketid: socket.id });
+      // post("/api/initsocket", { socketid: socket.id });
     });
   };
 
