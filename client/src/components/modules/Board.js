@@ -44,6 +44,65 @@ class Board extends Component {
     return {x: pixel % width, y: Math.floor(pixel/width)};
   }
 
+  /////////////////////////////////////////
+  // https://gist.github.com/remy/784508 //
+  /////////////////////////////////////////
+
+  trim(c) {
+    var ctx = c.getContext('2d'),
+      copy = document.createElement('canvas').getContext('2d'),
+      pixels = ctx.getImageData(0, 0, c.width, c.height),
+      l = pixels.data.length,
+      i,
+      bound = {
+        top: null,
+        left: null,
+        right: null,
+        bottom: null
+      },
+      x, y;
+  
+    for (i = 0; i < l; i += 4) {
+      if (pixels.data[i+3] !== 0) {
+        x = (i / 4) % c.width;
+        y = ~~((i / 4) / c.width);
+    
+        if (bound.top === null) {
+          bound.top = y;
+        }
+        
+        if (bound.left === null) {
+          bound.left = x; 
+        } else if (x < bound.left) {
+          bound.left = x;
+        }
+        
+        if (bound.right === null) {
+          bound.right = x; 
+        } else if (bound.right < x) {
+          bound.right = x;
+        }
+        
+        if (bound.bottom === null) {
+          bound.bottom = y;
+        } else if (bound.bottom < y) {
+          bound.bottom = y;
+        }
+      }
+    }
+      
+    var trimHeight = bound.bottom - bound.top,
+        trimWidth = bound.right - bound.left,
+        trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+    
+    copy.canvas.width = trimWidth;
+    copy.canvas.height = trimHeight;
+    copy.putImageData(trimmed, 0, 0);
+    
+    // open new window with trimmed image:
+    return copy.canvas;
+  }
+
   getPieces = (url, sites, width, height) => {
     /**
      * Returns list of URLs representing each puzzle piece
@@ -51,8 +110,6 @@ class Board extends Component {
     let ctx, canvas, imageData, pixels, img = new Image();
     img.crossOrigin = 'anonymous';
     img.src = url;
-    let canvases = [];
-    let contexts = [];
     let urls = [];
     for (let s=0; s<sites.length; s++) {
       canvas = document.createElement('canvas');
@@ -64,14 +121,14 @@ class Board extends Component {
       pixels = imageData.data;
       for (let i=0;i<pixels.length;i+=4) {
         if (!this.isClosest(this.toPoint(i, width), s, sites)) {
-          pixels[i] = pixels[i+1] = pixels[i+2] = pixels[i+3] = 0;
+          // pixels[i] = pixels[i+1] = pixels[i+2] = 
+          pixels[i+3] = 0;
         }
       }
       ctx.putImageData(imageData, 0, 0);
+      urls.push(this.trim(canvas).toDataURL('image/png'));
 
-      urls.push(canvas.toDataURL('image/png'));
-      canvases.push(canvas);
-      contexts.push(ctx);
+      //urls.push(canvas.toDataURL('image/png'));
     }
     return urls;
   }
@@ -212,13 +269,12 @@ document.addEventListener('mousedown', function(event) {
 
   render() {
     let URL = 'https://www.artic.edu/iiif/2/1adf2696-8489-499b-cad2-821d7fde4b33/full/400,/0/default.jpg';
-    let sites = this.generateSites(8, 400, 266);
+    let sites = this.generateSites(Math.random()*6+6, 400, 266);
     let pieces = this.getPieces(URL, sites, 400, 266);
     this.dragNDrop();
     
     return (
       <>
-        <p>hello</p>
         {pieces.map((url, index) => {
             return(<img key={index} src={ url } className="draggable"/>)
         })}
