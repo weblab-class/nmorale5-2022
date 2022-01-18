@@ -28,6 +28,10 @@ const Skeleton = ({ userId, handleLogin, handleLogout }) => {
           onFailure={(err) => console.log(err)}
         />
       )}
+      <p>
+        NOTE: if you click Start Game and nothing happens,
+        keep refreshing until it works :)
+      </p>
       <Link to="/game/">Start Game</Link>
     </>
   );
