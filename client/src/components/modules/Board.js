@@ -77,9 +77,9 @@ class Board extends Component {
   }
 
   render() {
-    let URL = 'https://www.artic.edu/iiif/2/1adf2696-8489-499b-cad2-821d7fde4b33/full/843,/0/default.jpg';
-    let sites = this.generateSites(8, 843, 561);
-    let pieces = this.getPieces(URL, sites, 843, 561);
+    let URL = 'https://www.artic.edu/iiif/2/1adf2696-8489-499b-cad2-821d7fde4b33/full/400,/0/default.jpg';
+    let sites = this.generateSites(8, 400, 266);
+    let pieces = this.getPieces(URL, sites, 400, 266);
     return (
       <>
         <p>hello</p>
