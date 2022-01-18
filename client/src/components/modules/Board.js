@@ -1,10 +1,16 @@
 import React, { useState, useEffect, Component } from "react";
 import Piece from "./Piece.js";
+import { get } from "../../utilities.js";
 import "./Board.css";
 
 class Board extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      imageId: [],
+      height: 0,
+      isLoaded: false,
+    }
   }
 
   generateSites = (n, width, height) => {
@@ -48,8 +54,8 @@ class Board extends Component {
   // https://gist.github.com/remy/784508 //
   /////////////////////////////////////////
 
-  trim(c) {
-    var ctx = c.getContext('2d'),
+  trim = (c) => {
+    let ctx = c.getContext('2d'),
       copy = document.createElement('canvas').getContext('2d'),
       pixels = ctx.getImageData(0, 0, c.width, c.height),
       l = pixels.data.length,
@@ -91,7 +97,7 @@ class Board extends Component {
       }
     }
       
-    var trimHeight = bound.bottom - bound.top,
+    let trimHeight = bound.bottom - bound.top,
         trimWidth = bound.right - bound.left,
         trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
     
@@ -107,26 +113,28 @@ class Board extends Component {
     /**
      * Returns list of URLs representing each puzzle piece
      */
-    let ctx, canvas, imageData, pixels, img = new Image();
+    let ctx, canvas, imageData, pixels, img = new Image(width, height);
+    canvas = document.createElement('canvas');
+    ctx = canvas.getContext('2d');
+    canvas.width = width;
+    canvas.height = height;
     img.crossOrigin = 'anonymous';
     img.src = url;
     let urls = [];
     for (let s=0; s<sites.length; s++) {
-      canvas = document.createElement('canvas');
-      ctx = canvas.getContext('2d');
-      canvas.width = width;
-      canvas.height = height;
       ctx.drawImage(img, 0, 0);
       imageData = ctx.getImageData(0, 0, width, height);
       pixels = imageData.data;
+      console.log(imageData.width, imageData.height);
       for (let i=0;i<pixels.length;i+=4) {
         if (!this.isClosest(this.toPoint(i, width), s, sites)) {
           // pixels[i] = pixels[i+1] = pixels[i+2] = 
           pixels[i+3] = 0;
         }
-      }
+      } 
       ctx.putImageData(imageData, 0, 0);
-      urls.push(this.trim(canvas).toDataURL('image/png'));
+      urls.push(canvas.toDataURL('image/png'));
+      //this.trim(canvas)
 
       //urls.push(canvas.toDataURL('image/png'));
     }
@@ -267,19 +275,54 @@ document.addEventListener('mousedown', function(event) {
   //                                               //
   ///////////////////////////////////////////////////
 
+  /*useEffect(() => {
+    getArt = () => {
+      let pageNum = Math.ceil(Math.random()*50);
+      let item = Math.floor(Math.random()*100);
+      get("https://api.artic.edu/api/v1/artworks", {page: pageNum, limit: 100}).then((artworks) => {
+        let id = artworks[item].image_id;
+        return ("https://www.artic.edu/iiif/2" + id + "/full/400,/0/default.jpg");
+      });
+    }
+  }, []);*/
+
+  componentDidMount() {
+    let pageNum = Math.ceil(Math.random()*50);
+    let item = Math.floor(Math.random()*100);
+    fetch("https://api.artic.edu/api/v1/artworks?limit=100&page=" + pageNum)
+      .then(res => res.json())
+      .then(json => {
+        this.setState({
+          isLoaded: true,
+          imageId: json.data[item].image_id,
+          height: Math.floor(json.data[item].thumbnail.height/json.data[item].thumbnail.width * 400),
+        })
+      });
+  }
   render() {
-    let URL = 'https://www.artic.edu/iiif/2/1adf2696-8489-499b-cad2-821d7fde4b33/full/400,/0/default.jpg';
-    let sites = this.generateSites(Math.random()*6+6, 400, 266);
-    let pieces = this.getPieces(URL, sites, 400, 266);
-    this.dragNDrop();
+    //let URL = 'https://www.artic.edu/iiif/2/1adf2696-8489-499b-cad2-821d7fde4b33/full/400,/0/default.jpg';
+    //let URL = this.getArt();
+
+    let { isLoaded } = this.state;
+
+    if (!isLoaded) {
+      return <div>Generating Puzzle...</div>;
+    } else {
+      let url = "https://www.artic.edu/iiif/2/" + this.state.imageId + "/full/400,/0/default.jpg"
+      console.log(url);
+      let sites = this.generateSites(Math.random()*6+6, 400, this.state.height);
+      let pieces = this.getPieces(url, sites, 400, this.state.height);
+      //this.dragNDrop();
+      return (
+        <>
+          {pieces.map((url, index) => {
+              return(<img key={index} src={ url } className="draggable"/>)
+          })}
+        </>
+      );
+    }
     
-    return (
-      <>
-        {pieces.map((url, index) => {
-            return(<img key={index} src={ url } className="draggable"/>)
-        })}
-      </>
-    );
+    
   }
 }
 

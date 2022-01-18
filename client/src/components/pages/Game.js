@@ -6,7 +6,6 @@ const Game = () => {
     return (
       <>
         <Link to="/">return</Link> 
-        <p>If nothing appears, just keep refreshing the page :)</p>
         <Board />
       </>
     );
