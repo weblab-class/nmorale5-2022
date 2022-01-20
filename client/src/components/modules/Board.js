@@ -1,7 +1,7 @@
 import React, { useState, useEffect, Component } from "react";
 import Piece from "./Piece.js";
 import "./Board.css";
-
+import test from "./test.jpg";
 class Board extends Component {
   constructor(props) {
     super(props);
@@ -13,8 +13,11 @@ class Board extends Component {
      */
     let sites = []
     for (let i=0; i<n; i++) {
-      sites.push({x:Math.random()*width, y:Math.random()*height})
-    } return sites;
+      sites.push({x:Math.random()*width, y:Math.random()*height});
+    } 
+    // sites.map((site) => console.log(site));
+
+    return sites;
   }
 
   distance = (pointA, pointB) => {
@@ -61,11 +64,14 @@ class Board extends Component {
         bottom: null
       },
       x, y;
+
+      
   
     for (i = 0; i < l; i += 4) {
       if (pixels.data[i+3] !== 0) {
         x = (i / 4) % c.width;
         y = ~~((i / 4) / c.width);
+        console.log(x, y);
     
         if (bound.top === null) {
           bound.top = y;
@@ -91,9 +97,10 @@ class Board extends Component {
       }
     }
       
-    var trimHeight = bound.bottom - bound.top,
-        trimWidth = bound.right - bound.left,
-        trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+    var trimHeight = bound.bottom - bound.top;
+    var trimWidth = bound.right - bound.left;
+    console.log(bound.left, bound.top, trimWidth, trimHeight);
+    var trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
     
     copy.canvas.width = trimWidth;
     copy.canvas.height = trimHeight;
@@ -107,17 +114,22 @@ class Board extends Component {
     /**
      * Returns list of URLs representing each puzzle piece
      */
-    let ctx, canvas, imageData, pixels, img = new Image();
+    console.log(url, sites, width, height);
+    let canvas, pixels;
+    let img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = url;
+    img.src = test;
     let urls = [];
     for (let s=0; s<sites.length; s++) {
       canvas = document.createElement('canvas');
-      ctx = canvas.getContext('2d');
+      let ctx = canvas.getContext('2d');
+  
       canvas.width = width;
       canvas.height = height;
       ctx.drawImage(img, 0, 0);
-      imageData = ctx.getImageData(0, 0, width, height);
+      console.log(width, height);
+      let imageData = ctx.getImageData(0, 0, width, height);
+      console.log(imageData);
       pixels = imageData.data;
       for (let i=0;i<pixels.length;i+=4) {
         if (!this.isClosest(this.toPoint(i, width), s, sites)) {
@@ -126,10 +138,12 @@ class Board extends Component {
         }
       }
       ctx.putImageData(imageData, 0, 0);
-      urls.push(this.trim(canvas).toDataURL('image/png'));
+      urls.push(canvas.toDataURL('image/png'));
 
       //urls.push(canvas.toDataURL('image/png'));
     }
+
+    // urls.map((url) => console.log(url));
     return urls;
   }
 
