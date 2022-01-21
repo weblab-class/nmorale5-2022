@@ -4,6 +4,7 @@ import "./Board.css";
 import test from "./test.jpg";
 const Board = (props) => {
   const [pieces, setPieces] = useState([]);
+  const [imageID, setImageID] = useState("");
 
   const generateSites = (n, width, height) => {
     /**
@@ -11,7 +12,7 @@ const Board = (props) => {
      */
     let sites = []
     for (let i=0; i<n; i++) {
-      sites.push({x:Math.random()*width, y:Math.random()*height});
+      sites.push({x: 20 + Math.random()*(width-40), y:20 + Math.random()*(height - 40)});
     } 
     // sites.map((site) => console.log(site));
 
@@ -96,7 +97,7 @@ const Board = (props) => {
       
     var trimHeight = bound.bottom - bound.top;
     var trimWidth = bound.right - bound.left;
-    console.log(bound.left, bound.top, trimWidth, trimHeight);
+    //console.log(bound.left, bound.top, trimWidth, trimHeight);
     var trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
     
     copy.canvas.width = trimWidth;
@@ -115,31 +116,34 @@ const Board = (props) => {
     let canvas, pixels;
     let img = new Image();
     img.crossOrigin = 'anonymous';
-    img.src = test;
-    let urls = [];
-    for (let s=0; s<sites.length; s++) {
-      canvas = document.createElement('canvas');
-      let ctx = canvas.getContext('2d');
-  
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0);
-      //console.log(width, height);
-      let imageData = ctx.getImageData(0, 0, width, height);
-      //console.log(imageData);
-      pixels = imageData.data;
-      for (let i=0;i<pixels.length;i+=4) {
-        if (!isClosest(toPoint(i, width), s, sites)) {
-          // pixels[i] = pixels[i+1] = pixels[i+2] = 
-          pixels[i+3] = 0;
+    img.src = url;
+    img.onload = function() {
+      let urls = [];
+      for (let s=0; s<sites.length; s++) { // TODO: change
+        //console.log(sites);
+        canvas = document.createElement('canvas');
+        let ctx = canvas.getContext('2d');
+    
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0);
+        //console.log(width, height);
+        let imageData = ctx.getImageData(0, 0, width, height);
+        //console.log(imageData);
+        pixels = imageData.data;
+        for (let i=0;i<pixels.length;i+=4) {
+          if (!isClosest(toPoint(i, width), s, sites)) {
+            // pixels[i] = pixels[i+1] = pixels[i+2] = 
+            pixels[i+3] = 0;
+          }
         }
+        ctx.putImageData(imageData, 0, 0);
+        urls.push(trim(canvas).toDataURL('image/png'));
       }
-      ctx.putImageData(imageData, 0, 0);
-      urls.push(trim(canvas).toDataURL('image/png'));
-    }
 
-    // urls.map((url) => console.log(url));
-    return urls;
+      // urls.map((url) => console.log(url));
+      setPieces(urls);
+    }
   };
 
   ///////////////////////////////////////////////////
@@ -277,9 +281,21 @@ const Board = (props) => {
   ///////////////////////////////////////////////////
 
   useEffect(() => {
+  //   let pageNum = Math.ceil(Math.random()*50);
+  //   let item = Math.floor(Math.random()*100);
+  //   fetch("https://api.artic.edu/api/v1/artworks?limit=100&page=" + pageNum)
+  //   .then(res => res.json())
+  //   .then(json => {
+  //     setImageID(json.data[item].image_id);
+  //     let sites = generateSites(Math.random()*6+6, 400, 266);
+  //     let height = Math.floor(json.data[item].thumbnail.height/json.data[item].thumbnail.width * 400);
+  //     setPieces(
+
+  //     })
+  //   });
     let URL = 'https://www.artic.edu/iiif/2/1adf2696-8489-499b-cad2-821d7fde4b33/full/400,/0/default.jpg';
     let sites = generateSites(Math.random()*6+6, 400, 266);
-    setPieces(getPieces(URL, sites, 400, 266));
+    getPieces(URL, sites, 400, 266);
     dragNDrop();
   }, []);
     
