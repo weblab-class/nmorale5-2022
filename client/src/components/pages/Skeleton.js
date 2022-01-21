@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from "react";
+import React, { useEffect } from "react";
 import GoogleLogin, { GoogleLogout } from "react-google-login";
 import { Link } from "@reach/router";
 
