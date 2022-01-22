@@ -5,8 +5,8 @@ import { Link } from "@reach/router";
 const Game = () => {
     return (
       <>
-        <Link to="/">return</Link> 
-        <p>If nothing appears, just keep refreshing the page :)</p>
+        <Link to="/">return</Link>
+        <p>the best game of all time</p>
         <Board />
       </>
     );

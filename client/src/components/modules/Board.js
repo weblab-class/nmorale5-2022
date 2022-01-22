@@ -12,7 +12,7 @@ const Board = (props) => {
      */
     let sites = []
     for (let i=0; i<n; i++) {
-      sites.push({x: 20 + Math.random()*(width-40), y:20 + Math.random()*(height - 40)});
+      sites.push({x: Math.random()*width, y:Math.random()*height});
     } 
     // sites.map((site) => console.log(site));
 
@@ -108,7 +108,7 @@ const Board = (props) => {
     return copy.canvas;
   };
 
-  const getPieces = (url, sites, width, height) => {
+  const makePieces = (url, sites, width, height) => {
     /**
      * Returns list of URLs representing each puzzle piece
      */
@@ -281,21 +281,20 @@ const Board = (props) => {
   ///////////////////////////////////////////////////
 
   useEffect(() => {
-  //   let pageNum = Math.ceil(Math.random()*50);
-  //   let item = Math.floor(Math.random()*100);
-  //   fetch("https://api.artic.edu/api/v1/artworks?limit=100&page=" + pageNum)
-  //   .then(res => res.json())
-  //   .then(json => {
-  //     setImageID(json.data[item].image_id);
-  //     let sites = generateSites(Math.random()*6+6, 400, 266);
-  //     let height = Math.floor(json.data[item].thumbnail.height/json.data[item].thumbnail.width * 400);
-  //     setPieces(
-
-  //     })
-  //   });
-    let URL = 'https://www.artic.edu/iiif/2/1adf2696-8489-499b-cad2-821d7fde4b33/full/400,/0/default.jpg';
-    let sites = generateSites(Math.random()*6+6, 400, 266);
-    getPieces(URL, sites, 400, 266);
+    let pageNum = Math.ceil(Math.random()*50);
+    let item = Math.floor(Math.random()*100);
+    fetch("https://api.artic.edu/api/v1/artworks?limit=100&page=" + pageNum)
+    .then(res => res.json())
+    .then(json => {
+      setImageID(json.data[item].image_id);
+      let height = Math.floor(json.data[item].thumbnail.height/json.data[item].thumbnail.width * 400);
+      let sites = generateSites(Math.random()*6+6, 400, height);
+      makePieces('https://www.artic.edu/iiif/2/' + json.data[item].image_id + '/full/400,/0/default.jpg', sites, 400, height);
+      //console.log('https://www.artic.edu/iiif/2/' + json.data[item].image_id + '/full/400,/0/default.jpg');
+      });
+    // let URL = 'https://www.artic.edu/iiif/2/1adf2696-8489-499b-cad2-821d7fde4b33/full/400,/0/default.jpg';
+    // let sites = generateSites(Math.random()*6+6, 400, 266);
+    // makePieces(URL, sites, 400, 266);
     dragNDrop();
   }, []);
     
