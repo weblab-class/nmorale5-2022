@@ -46,9 +46,9 @@ const Board = (props) => {
     return {x: pixel % width, y: Math.floor(pixel/width)};
   };
 
-  /////////////////////////////////////////
-  // https://gist.github.com/remy/784508 //
-  /////////////////////////////////////////
+  ///////////////////////////////////////////
+  //  https://gist.github.com/remy/784508  //
+  ///////////////////////////////////////////
 
   const trim = (c) => {
     var ctx = c.getContext('2d'),
@@ -147,10 +147,7 @@ const Board = (props) => {
   };
 
   ///////////////////////////////////////////////////
-  //                                               //
-  //        BELOW IS LITERALLY TAKEN FROM:         //
   //  https://en.js.cx/task/drag-heroes/solution/  //
-  //                                               //
   ///////////////////////////////////////////////////
 
   const dragNDrop = () => {
@@ -273,13 +270,6 @@ const Board = (props) => {
 
   };
 
-  ///////////////////////////////////////////////////
-  //                                               //
-  //        ABOVE IS LITERALLY TAKEN FROM:         //
-  //  https://en.js.cx/task/drag-heroes/solution/  //
-  //                                               //
-  ///////////////////////////////////////////////////
-
   useEffect(() => {
     let pageNum = Math.ceil(Math.random()*50);
     let item = Math.floor(Math.random()*100);
@@ -301,7 +291,7 @@ const Board = (props) => {
   return (
     <>
       {pieces.map((url, index) => {
-          return(<img key={index} src={url} className="draggable"/>)
+          return(<img key={index} src={url} className="draggable"/>);
       })}
     </>
   );
