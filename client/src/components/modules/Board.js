@@ -2,10 +2,11 @@ import React, { useState, useEffect, Component } from "react";
 import "./Board.css";
 import { setupCanvas, drawCanvas } from "../../canvasManager.js";
 import { gameState } from "../../logic.js";
+import { Link } from "@reach/router";
 
 const Board = (props) => {
-  const [imageID, setImageID] = useState("");
   const [level, setLevel] = useState(0);
+  const [levelComplete, setLevelComplete] = useState(false);
 
   let ready = false;
   let nextPuzzle = {
@@ -176,7 +177,6 @@ const Board = (props) => {
     .then(res => res.json())
     .then(json => {
       console.log('got image');
-      setImageID(json.data[item].image_id);
       let height = Math.floor(json.data[item].thumbnail.height/json.data[item].thumbnail.width * 400);
       nextPuzzle.solution = {
         x: window.innerWidth/2-200,
@@ -195,6 +195,9 @@ const Board = (props) => {
   };
 
   const checkNextLevel = () => {
+    if (gameState.score !== null) {
+      setLevelComplete(true);
+    }
     let change, nextLevel;
     if (level === 0) {
       if (ready) {
@@ -239,7 +242,15 @@ const Board = (props) => {
     
   return (
     <>
-      <canvas id="main-canvas" />
+      {!levelComplete ? (
+        <canvas id="main-canvas" />
+      ) : (
+        <div>
+          <Link to="/" className="Board-button">Return</Link>
+          <h2 className="Board-title">Your Final Score:</h2>
+          <h2 className="Board-title">{Math.floor(gameState.score*100)/100}</h2>
+        </div>
+      )}
     </>
   );
 }

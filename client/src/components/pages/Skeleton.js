@@ -12,7 +12,7 @@ const Skeleton = ({ userId, handleLogin, handleLogout }) => {
 
   return (
     <>
-      <h1>Jigsaw Frenzy</h1>
+      <div className="Skeleton-title">Jigsaw Frenzy</div>
       {userId ? (
         <GoogleLogout
           clientId={GOOGLE_CLIENT_ID}
@@ -32,7 +32,7 @@ const Skeleton = ({ userId, handleLogin, handleLogout }) => {
         NOTE: if you click Start Game and nothing happens,
         keep refreshing until it works :)
       </p>
-      <Link to="/game/">Start Game</Link>
+      <Link to="/game/" className="Skeleton-button">Start Game</Link>
     </>
   );
 };

@@ -2,11 +2,13 @@ import { gameState } from "./logic.js";
 
 let CANVAS;
 let CONTEXT;
+let timer;
 
 /** mouse listeners */
 export const setupCanvas = () => {
     CANVAS = document.getElementById('main-canvas');
     CONTEXT = CANVAS.getContext('2d');
+    timer = 0;
     CANVAS.addEventListener("mousedown",onMouseDown);
     CANVAS.addEventListener("mousemove",onMouseMove);
     CANVAS.addEventListener("mouseup",onMouseUp);
@@ -62,6 +64,8 @@ const onMouseUp = () => {
         gameState.rack.push(gameState.selected);
     }
     gameState.selected = null;
+    if (gameState.complete.length === gameState.pieces.length)
+    gameState.score = timer;
 };
 
 /** main draw */
@@ -76,10 +80,10 @@ export const drawCanvas = () => {
 
     /** Loading Screen (Level 0) */
     if (gameState.level === 0) {
-        CONTEXT.font = "30px Comic Sans MS";
-        CONTEXT.fillStyle = "blue";
+        CONTEXT.font = "80px Arial";
+        CONTEXT.fillStyle = "cyan";
         CONTEXT.textAlign = "center";
-        CONTEXT.fillText("Hello World", CANVAS.width/2, CANVAS.height/2);
+        CONTEXT.fillText("Get Ready...", CANVAS.width/2, CANVAS.height/2);
         return;
     }
 
@@ -108,4 +112,11 @@ export const drawCanvas = () => {
         p = gameState.pieces[gameState.selected];
         if (p) CONTEXT.drawImage(p.image, p.location.x, p.location.y);
     }
+
+    if (gameState.rack.length !== 0 || gameState.selected !== null){
+        timer += 1/60;
+    }
+    CONTEXT.font = "60px Arial";
+    CONTEXT.fillStyle = "cyan";
+    CONTEXT.fillText(Math.floor(timer), 20, 80);
 }

@@ -11,4 +11,6 @@ export const gameState = {
     original: null, // location of selected piece when first clicked, if any
 
     solution: null, // { x, y, width, height } of where solution will be displayed
+
+    score: null, // finishing time
 };

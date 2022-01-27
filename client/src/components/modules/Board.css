@@ -1,1 +1,16 @@
+.Board-button {
+  background-color: #e7d325;
+  border: none;
+  color: black;
+  padding: 15px 40px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 50px;
+}
 
+.Board-title {
+  text-align: center;
+  font-size: 100px;
+  color: #48c1f4;
+}

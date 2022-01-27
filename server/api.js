@@ -14,6 +14,7 @@ const User = require("./models/user");
 
 // import authentication library
 const auth = require("./auth");
+const score = require("./models/score");
 
 // api endpoints: all these paths will be prefixed with "/api/"
 const router = express.Router();
@@ -41,6 +42,13 @@ router.get("/whoami", (req, res) => {
 // |------------------------------|
 // | write your API methods below!|
 // |------------------------------|
+
+// router.post("/score", auth.ensureLoggedIn, (req, res) => {
+//   const newScore = new Score({
+//     user: req.user._id,
+//     score: 
+//   })
+// })
 
 // anything else falls to this "not found" case
 router.all("*", (req, res) => {
