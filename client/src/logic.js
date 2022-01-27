@@ -1,5 +1,7 @@
 /** game state */
 export const gameState = {
+    level: 0,
+
     pieces: [], // all piece objects (containing image, site, location, solution)
     rack: [], // indices of currently moveable pieces
     complete: [], // indices of pieces already added to center

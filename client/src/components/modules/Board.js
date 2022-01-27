@@ -7,6 +7,22 @@ const Board = (props) => {
   const [imageID, setImageID] = useState("");
   const [level, setLevel] = useState(0);
 
+  let ready = false;
+  let nextPuzzle = {
+    // copied from logic.js
+    level: null,
+
+    pieces: [], // all piece objects (containing image, site, location, solution)
+    rack: [], // indices of currently moveable pieces
+    complete: [], // indices of pieces already added to center
+
+    selected: null, // index of selected piece, if any
+    offset: null, // offset of selected piece, if any
+    original: null, // location of selected piece when first clicked, if any
+
+    solution: null, // { x, y, width, height } of where solution will be displayed
+  }
+
   const generateSites = (n, width, height) => {
     /**
      * Returns n random sites for voronoi construction {x, y}
@@ -136,10 +152,13 @@ const Board = (props) => {
         newImg.crossOrigin = 'anonymous';
         newImg.src = newTrim.canvas.toDataURL('image/png');
         newImg.onload = function() {
-          gameState.pieces.push({
+          nextPuzzle.pieces.push({
             image: newImg,
             site: sites[s],
-            location: null,
+            location: {
+              x: Math.random()*(window.innerWidth - 100),
+              y: Math.random()*(window.innerHeight - 100),
+            },
             solution: newTrim.solution,
           });
         }
@@ -158,47 +177,65 @@ const Board = (props) => {
     .then(json => {
       console.log('got image');
       setImageID(json.data[item].image_id);
-      let height = Math.floor(json.data[item].thumbnail.height/json.data[item].thumbnail.width * 600);
-      gameState.solution = {
-        x: window.innerWidth/2-300,
-        y: 50,
-        width: 600,
+      let height = Math.floor(json.data[item].thumbnail.height/json.data[item].thumbnail.width * 400);
+      nextPuzzle.solution = {
+        x: window.innerWidth/2-200,
+        y: 80,
+        width: 400,
         height: height,
       }
-      let sites = generateSites(n, 600, height);
+      let sites = generateSites(n, 400, height);
       console.log('generated sites');
-      makePieces('https://www.artic.edu/iiif/2/' + json.data[item].image_id + '/full/600,/0/default.jpg', sites, 600, height);
-    });
-  }
-
-  const displayGame = () => {
-    setInterval(() => {
-      if (gameState.pieces.length === 10 && level !== 1) {
-        setLevel(1);
+      makePieces('https://www.artic.edu/iiif/2/' + json.data[item].image_id + '/full/400,/0/default.jpg', sites, 400, height);
+      for (let i=0; i<n; i++) {
+        nextPuzzle.rack.push(i);
       }
-      drawCanvas(gameState);
+      ready = true;
+    });
+  };
+
+  const checkNextLevel = () => {
+    let change, nextLevel;
+    if (level === 0) {
+      if (ready) {
+        change = true;
+        ready = false;
+        nextLevel = 1;
+        console.log('new level');
+      }
+    } else {
+      if (ready && gameState.complete.length === gameState.pieces.length) {
+        change = true;
+        ready = false;
+        nextLevel = level+1;
+        console.log('new level');
+      }
+    }
+    if (change) {
+      gameState.level = nextLevel;
+      gameState.pieces = nextPuzzle.pieces;
+      gameState.rack = nextPuzzle.rack;
+      gameState.complete = nextPuzzle.complete;
+      gameState.selected = nextPuzzle.selected;
+      gameState.offset = nextPuzzle.offset;
+      gameState.original = nextPuzzle.original;
+      gameState.solution = nextPuzzle.solution;
+    }
+  };
+
+  const runGame = () => {
+    setInterval(() => {
+      checkNextLevel();
+      drawCanvas();
     }, 1000/60);
-  }
+  };
 
   useEffect(() => {
     /** main function called when mounted */
     setupCanvas();
     preparePuzzle(10);
-    displayGame();
+    runGame();
   }, []);
-
-  useEffect(() => {
-    /** set up level */
-    if (level === 0) return;
-    console.log('new level');
-    gameState.rack = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    for (let i=0; i<gameState.pieces.length; i++) {
-      gameState.pieces[i].location = {
-        x: Math.random()*(window.innerWidth - 100),
-        y: Math.random()*(window.innerHeight - 100),
-      }
-    }
-  }, [level]);
     
   return (
     <>

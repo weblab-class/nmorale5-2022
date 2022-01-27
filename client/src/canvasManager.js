@@ -27,6 +27,7 @@ const getSelectedPiece = (loc) => {
 };
 
 const onMouseDown = (e) => {
+    if (gameState.selected !== null) return;
     getSelectedPiece(e);
     if (gameState.selected !== null) {
         gameState.offset = { 
@@ -49,9 +50,11 @@ const onMouseMove = (e) => {
 const onMouseUp = () => {
     if (gameState.selected === null) return;
     let p = gameState.pieces[gameState.selected];
-    let dist = Math.abs(p.location.x - (p.solution.x + gameState.solution.x)) +
-        Math.abs(p.location.y - (p.solution.y + gameState.solution.y));
-    if (dist < 20) {
+    let dist = Math.hypot(
+        p.location.x - (p.solution.x + gameState.solution.x),
+        p.location.y - (p.solution.y + gameState.solution.y)
+    );
+    if (dist < 25) {
         p.location.x = p.solution.x + gameState.solution.x;
         p.location.y = p.solution.y + gameState.solution.y;
         gameState.complete.push(gameState.selected);
@@ -62,7 +65,7 @@ const onMouseUp = () => {
 };
 
 /** main draw */
-export const drawCanvas = (drawState) => {
+export const drawCanvas = () => {
     if (!CANVAS) return;
     CANVAS.width = window.innerWidth;
     CANVAS.height = window.innerHeight;
@@ -71,29 +74,38 @@ export const drawCanvas = (drawState) => {
     CONTEXT.fillStyle = 'black';
     CONTEXT.fillRect(0, 0, CANVAS.width, CANVAS.height);
 
+    /** Loading Screen (Level 0) */
+    if (gameState.level === 0) {
+        CONTEXT.font = "30px Comic Sans MS";
+        CONTEXT.fillStyle = "blue";
+        CONTEXT.textAlign = "center";
+        CONTEXT.fillText("Hello World", CANVAS.width/2, CANVAS.height/2);
+        return;
+    }
+
     /** solution background */
-    if (drawState.solution) {
+    if (gameState.solution) {
         CONTEXT.fillStyle = 'grey';
-        let s = drawState.solution;
+        let s = gameState.solution;
         CONTEXT.fillRect(s.x, s.y, s.width, s.height);
     }
 
     /** display solved pieces */
     let p;
-    for (let i of drawState.complete) {
-        p = drawState.pieces[i];
-        CONTEXT.drawImage(p.image, p.location.x, p.location.y);
+    for (let i of gameState.complete) {
+        p = gameState.pieces[i];
+        if (p) CONTEXT.drawImage(p.image, p.location.x, p.location.y);
     }
 
     /** display rack pieces */
-    for (let i of drawState.rack) {
-        p = drawState.pieces[i];
-        CONTEXT.drawImage(p.image, p.location.x, p.location.y);
+    for (let i of gameState.rack) {
+        p = gameState.pieces[i];
+        if (p) CONTEXT.drawImage(p.image, p.location.x, p.location.y);
     }
 
     /** display selected piece */
-    if (drawState.selected !== null) {
-        p = drawState.pieces[drawState.selected];
-        CONTEXT.drawImage(p.image, p.location.x, p.location.y);
+    if (gameState.selected !== null) {
+        p = gameState.pieces[gameState.selected];
+        if (p) CONTEXT.drawImage(p.image, p.location.x, p.location.y);
     }
 }
