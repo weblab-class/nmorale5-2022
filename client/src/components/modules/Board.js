@@ -64,8 +64,6 @@ const Board = (props) => {
         bottom: null
       },
       x, y;
-
-      
   
     for (i = 0; i < l; i += 4) {
       if (pixels.data[i+3] !== 0) {
@@ -98,7 +96,6 @@ const Board = (props) => {
       
     var trimHeight = bound.bottom - bound.top;
     var trimWidth = bound.right - bound.left;
-    //console.log(bound.left, bound.top, trimWidth, trimHeight);
     var trimmed = ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
     
     copy.canvas.width = trimWidth;
@@ -106,7 +103,7 @@ const Board = (props) => {
     copy.putImageData(trimmed, 0, 0);
     
     // open new window with trimmed image:
-    return copy.canvas;
+    return { canvas: copy.canvas, solution: {x:bound.left, y:bound.top} };
   };
 
   const makePieces = (url, sites, width, height) => {
@@ -134,11 +131,17 @@ const Board = (props) => {
           }
         }
         ctx.putImageData(imageData, 0, 0);
+        let newTrim = trim(canvas)
         let newImg = new Image();
         newImg.crossOrigin = 'anonymous';
-        newImg.src = trim(canvas).toDataURL('image/png');
+        newImg.src = newTrim.canvas.toDataURL('image/png');
         newImg.onload = function() {
-          gameState.pieces.push({image: newImg, site: sites[s], location: null});
+          gameState.pieces.push({
+            image: newImg,
+            site: sites[s],
+            location: null,
+            solution: newTrim.solution,
+          });
         }
         console.log('progress');
       }
@@ -146,8 +149,7 @@ const Board = (props) => {
     }
   };
 
-  useEffect(() => {
-    setupCanvas();
+  const preparePuzzle = (n) => {
     let pageNum = Math.ceil(Math.random()*50);
     let item = Math.floor(Math.random()*100);
     console.log('fetching image');
@@ -156,30 +158,44 @@ const Board = (props) => {
     .then(json => {
       console.log('got image');
       setImageID(json.data[item].image_id);
-      let height = Math.floor(json.data[item].thumbnail.height/json.data[item].thumbnail.width * 400);
-      let numPieces = Math.floor(Math.random()*6+6);
-      let sites = generateSites(numPieces, 400, height);
+      let height = Math.floor(json.data[item].thumbnail.height/json.data[item].thumbnail.width * 600);
+      gameState.solution = {
+        x: window.innerWidth/2-300,
+        y: 50,
+        width: 600,
+        height: height,
+      }
+      let sites = generateSites(n, 600, height);
       console.log('generated sites');
-      makePieces('https://www.artic.edu/iiif/2/' + json.data[item].image_id + '/full/400,/0/default.jpg', sites, 400, height);
-      setInterval(() => {
-        if (gameState.pieces.length === numPieces && level !== 1) {
-          setLevel(1);
-        }
-        drawCanvas(gameState);
-      }, 1000/60);
-      });
-    // let URL = 'https://www.artic.edu/iiif/2/1adf2696-8489-499b-cad2-821d7fde4b33/full/400,/0/default.jpg';
+      makePieces('https://www.artic.edu/iiif/2/' + json.data[item].image_id + '/full/600,/0/default.jpg', sites, 600, height);
+    });
+  }
+
+  const displayGame = () => {
+    setInterval(() => {
+      if (gameState.pieces.length === 10 && level !== 1) {
+        setLevel(1);
+      }
+      drawCanvas(gameState);
+    }, 1000/60);
+  }
+
+  useEffect(() => {
+    /** main function called when mounted */
+    setupCanvas();
+    preparePuzzle(10);
+    displayGame();
   }, []);
 
   useEffect(() => {
     /** set up level */
     if (level === 0) return;
     console.log('new level');
-    gameState.rack = [0, 1, 2, 3];
+    gameState.rack = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
     for (let i=0; i<gameState.pieces.length; i++) {
       gameState.pieces[i].location = {
-        x: Math.random()*window.innerWidth,
-        y: Math.random()*window.innerHeight,
+        x: Math.random()*(window.innerWidth - 100),
+        y: Math.random()*(window.innerHeight - 100),
       }
     }
   }, [level]);

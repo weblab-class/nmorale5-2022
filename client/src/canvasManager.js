@@ -33,6 +33,7 @@ const onMouseDown = (e) => {
             x:e.x-gameState.pieces[gameState.selected].location.x,
             y:e.y-gameState.pieces[gameState.selected].location.y,
         }
+        gameState.original = {...gameState.offset};
     }
 };
 
@@ -46,10 +47,18 @@ const onMouseMove = (e) => {
 };
 
 const onMouseUp = () => {
-    if (gameState.selected !== null) {
+    if (gameState.selected === null) return;
+    let p = gameState.pieces[gameState.selected];
+    let dist = Math.abs(p.location.x - (p.solution.x + gameState.solution.x)) +
+        Math.abs(p.location.y - (p.solution.y + gameState.solution.y));
+    if (dist < 20) {
+        p.location.x = p.solution.x + gameState.solution.x;
+        p.location.y = p.solution.y + gameState.solution.y;
+        gameState.complete.push(gameState.selected);
+    } else {
         gameState.rack.push(gameState.selected);
-        gameState.selected = null;
     }
+    gameState.selected = null;
 };
 
 /** main draw */
@@ -62,12 +71,27 @@ export const drawCanvas = (drawState) => {
     CONTEXT.fillStyle = 'black';
     CONTEXT.fillRect(0, 0, CANVAS.width, CANVAS.height);
 
-    /** display pieces */
+    /** solution background */
+    if (drawState.solution) {
+        CONTEXT.fillStyle = 'grey';
+        let s = drawState.solution;
+        CONTEXT.fillRect(s.x, s.y, s.width, s.height);
+    }
+
+    /** display solved pieces */
     let p;
+    for (let i of drawState.complete) {
+        p = drawState.pieces[i];
+        CONTEXT.drawImage(p.image, p.location.x, p.location.y);
+    }
+
+    /** display rack pieces */
     for (let i of drawState.rack) {
         p = drawState.pieces[i];
         CONTEXT.drawImage(p.image, p.location.x, p.location.y);
     }
+
+    /** display selected piece */
     if (drawState.selected !== null) {
         p = drawState.pieces[drawState.selected];
         CONTEXT.drawImage(p.image, p.location.x, p.location.y);
