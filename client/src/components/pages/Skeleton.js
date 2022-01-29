@@ -13,7 +13,7 @@ const Skeleton = ({ userId, handleLogin, handleLogout }) => {
   return (
     <>
       <div className="Skeleton-title">Jigsaw Frenzy</div>
-      {userId ? (
+      {/* {userId ? (
         <GoogleLogout
           clientId={GOOGLE_CLIENT_ID}
           buttonText="Logout"
@@ -27,11 +27,7 @@ const Skeleton = ({ userId, handleLogin, handleLogout }) => {
           onSuccess={handleLogin}
           onFailure={(err) => console.log(err)}
         />
-      )}
-      <p>
-        NOTE: if you click Start Game and nothing happens,
-        keep refreshing until it works :)
-      </p>
+      )} */}
       <Link to="/game/" className="Skeleton-button">Start Game</Link>
     </>
   );

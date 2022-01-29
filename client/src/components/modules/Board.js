@@ -172,25 +172,30 @@ const Board = (props) => {
   const preparePuzzle = (n) => {
     let pageNum = Math.ceil(Math.random()*50);
     let item = Math.floor(Math.random()*100);
+    for (let i=0; i<n; i++) {
+      nextPuzzle.rack.push(i);
+    }
     console.log('fetching image');
     fetch("https://api.artic.edu/api/v1/artworks?limit=100&page=" + pageNum)
     .then(res => res.json())
     .then(json => {
       console.log('got image');
-      let height = Math.floor(json.data[item].thumbnail.height/json.data[item].thumbnail.width * 400);
-      nextPuzzle.solution = {
-        x: window.innerWidth/2-200,
-        y: 80,
-        width: 400,
-        height: height,
+      let newURL = 'https://www.artic.edu/iiif/2/' + json.data[item].image_id + '/full/400,/0/default.jpg';
+      let newImage = new Image();
+      newImage.src = newURL;
+      newImage.onload = function() {
+        let height = newImage.height;
+        let sites = generateSites(n, 400, height);
+        console.log('generated sites');
+        makePieces(newURL, sites, 400, height);
+        nextPuzzle.solution = {
+          x: window.innerWidth/2-200,
+          y: 80,
+          width: 400,
+          height: height,
+        }
+        ready = true;
       }
-      let sites = generateSites(n, 400, height);
-      console.log('generated sites');
-      makePieces('https://www.artic.edu/iiif/2/' + json.data[item].image_id + '/full/400,/0/default.jpg', sites, 400, height);
-      for (let i=0; i<n; i++) {
-        nextPuzzle.rack.push(i);
-      }
-      ready = true;
     });
   };
 
@@ -226,18 +231,35 @@ const Board = (props) => {
     }
   };
 
+  const initializeGameState = () => {
+    gameState.level = 0;
+    gameState.pieces = [];
+    gameState.rack = [];
+    gameState.complete = [];
+    gameState.selected = null;
+    gameState.offset = null;
+    gameState.original = null;
+    gameState.solution = null;
+    gameState.score = null;
+  }
+
   const runGame = () => {
-    setInterval(() => {
+    let t = setInterval(() => {
       checkNextLevel();
       drawCanvas();
-    }, 1000/60);
+    }, 1000/120);
+    return t;
   };
 
   useEffect(() => {
     /** main function called when mounted */
+    initializeGameState();
     setupCanvas();
     preparePuzzle(10);
-    runGame();
+    let t = runGame();
+    return () => {
+      clearInterval(t);
+    };
   }, []);
     
   return (

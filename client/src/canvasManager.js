@@ -114,7 +114,7 @@ export const drawCanvas = () => {
     }
 
     if (gameState.rack.length !== 0 || gameState.selected !== null){
-        timer += 1/60;
+        timer += 1/120;
     }
     CONTEXT.font = "60px Arial";
     CONTEXT.fillStyle = "cyan";
